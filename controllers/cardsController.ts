@@ -12,3 +12,9 @@ export async function activateCard(req: Request, res: Response){
 	const card = await cardsService.activateCard(cardNumber, cvc, newPassword)
 	res.status(200).send('Card activated!')
 }
+
+export async function verifyCardTransactions(req: Request, res: Response){
+	const {cardNumber, cvc} = req.body
+	const transactions = cardsService.verifyCardTransactions(cardNumber, cvc)
+	res.status(200).send(transactions)
+}

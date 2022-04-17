@@ -13,6 +13,11 @@ export const newCardSchema = Joi.object({
 	cpf: Joi.string().min(11).max(11).required()
 })
 
+export const cardTransactionsSchema = Joi.object({
+	cardNumber: Joi.string().pattern(/^[0-9]{1,}$/).required(),
+	cvc: Joi.string().pattern(/^[0-9]{3}$/).required()
+})
+
 export const activateCardSchema = Joi.object({
 	cardNumber: Joi.string().pattern(/^[0-9]{1,}$/).required(),
 	cvc: Joi.string().pattern(/^[0-9]{3}$/).required(),

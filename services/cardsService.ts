@@ -1,5 +1,7 @@
 import * as cardRepository from "../repositories/cardRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
+import * as paymentRepository from "../repositories/paymentRepository.js";
+import * as rechargeRepository from "../repositories/rechargeRepository.js";
 import { faker } from "@faker-js/faker"
 import dayjs from "dayjs"
 import bcrypt from "bcrypt"
@@ -66,4 +68,26 @@ export async function activateCard(number: string, cvc: string, newPassword: str
 	const cryptoPassword = bcrypt.hashSync(newPassword, 3)
 	const updatedCardData: cardRepository.CardUpdateData = {password: cryptoPassword}
 	await cardRepository.update(card.id, updatedCardData)
+}
+
+export async function verifyCardTransactions(cardNumber: string, cvc: string){
+	const card = await cardRepository.findByNumber(cardNumber)
+	if(!card) throw {type: 404, message: 'mispelled card number or non existant card'}
+	if(!bcrypt.compareSync(cvc, card.securityCode)) throw {type: 401, message: 'wrong cvc number'}
+
+	const payments = await paymentRepository.findByCardId(card.id)
+	const recharges = await rechargeRepository.findByCardId(card.id)
+	let balance = 0
+	for(let i = 0; i < recharges.length; i++){
+		balance += recharges[i].amount
+	}
+	for(let i = 0; i < payments.length; i++){
+		balance -= payments[i].amount
+	}
+	const transactions = {
+		balance,
+		transactions: payments,
+		recharges
+	}
+	return transactions
 }
