@@ -1,6 +1,7 @@
 import {Request, Response, NextFunction} from "express"
 
 const TypesAndMessages = {
+	400: 'bad request',
 	401: 'unauthorized',
 	404: 'not found',
 	409: 'conflict',

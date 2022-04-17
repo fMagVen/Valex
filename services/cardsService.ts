@@ -4,6 +4,8 @@ import { faker } from "@faker-js/faker"
 import dayjs from "dayjs"
 import bcrypt from "bcrypt"
 import "dotenv/config"
+
+
 export async function createCard(type: cardRepository.TransactionTypes, cpf: string){
 
 	const employee = await employeeRepository.findByCpf(cpf)
@@ -51,4 +53,17 @@ export async function createCard(type: cardRepository.TransactionTypes, cpf: str
 	await cardRepository.insert(finalCardData)
 
 	return {...finalCardData, securityCode: cvc}
+}
+
+export async function activateCard(number: string, cvc: string, newPassword: string){
+
+	const card = await cardRepository.findByNumber(number)
+	if(!card) throw {type: 404, message: 'mispelled card number or non existant card'}
+	if(card.expirationDate < Date.now()) throw {type: 401, message: 'card already expired'}
+	if(card.password) throw {type: 400, message: 'card already activated'}
+	if(!bcrypt.compareSync(cvc, card.securityCode)) throw {type: 401, message: 'wrong cvc number'}
+
+	const cryptoPassword = bcrypt.hashSync(newPassword, 3)
+	const updatedCardData: cardRepository.CardUpdateData = {password: cryptoPassword}
+	await cardRepository.update(card.id, updatedCardData)
 }
