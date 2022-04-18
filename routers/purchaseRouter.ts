@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { makePurchase } from "../controllers/paymentsController.js";
+import { makePurchase, onlinePurchase } from "../controllers/paymentsController.js";
 import validateSchema from "../middlewares/validadeSchemaMiddleware.js";
-import { purchaseSchema } from "../schemas/purchaseSchema.js";
+import { onlinePurchaseSchema, purchaseSchema } from "../schemas/purchaseSchema.js";
 
 const purchaseRouter = Router()
 
 purchaseRouter.post('/buy', validateSchema(purchaseSchema), makePurchase)
+purchaseRouter.post('/online', validateSchema(onlinePurchaseSchema), onlinePurchase)
 
 export default purchaseRouter

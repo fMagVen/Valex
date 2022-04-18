@@ -2,7 +2,9 @@ import * as cardRepository from "../repositories/cardRepository.js"
 import * as businessRepository from "../repositories/businessRepository.js"
 import * as paymentRepository from "../repositories/paymentRepository.js"
 import getTransactionsById from "../helpers/transactionsHelper.js"
+import validateCardData from "../helpers/cardValidationHelper.js"
 import bcrypt from "bcrypt"
+import validateBusinessAndPurchase from "../helpers/businessValidationHelper.js"
 
 export async function makePurchase(
 	cardNumber: string,
@@ -10,17 +12,44 @@ export async function makePurchase(
 	businessName: string,
 	amount: number
 	){
-	const card = await cardRepository.findByNumber(cardNumber)
-	if(!card) throw {type: 404, message: 'mispelled card number or non existant card'}
-	if(!bcrypt.compareSync(password, card.password)) throw {type: 401, message: 'wrong password'}
-	if(card.expirationDate < Date.now()) throw {type: 401, message: 'card expired, contact your employer soliciting a new one'}
+	const data = {
+		cardNumber,
+		password,
+		purchaseAttempt: true
+	}
+	const card = await validateCardData(data)
 
-	const business = await businessRepository.findByName(businessName)
-	if(!business) throw {type: 404, message: 'business not found or name mispelled'}
-	if(business.type != card.type) throw {type: 401, message: 'business type different from card type'}
+	const business = await validateBusinessAndPurchase(businessName, amount, card)
 
-	const {balance} = await getTransactionsById(card.id)
-	if(balance < amount) throw {type: 401, message: 'insuficient funds on card to complete purchase'}
+	const paymentData: paymentRepository.PaymentInsertData = {
+		cardId: card.id,
+		businessId: business.id,
+		amount
+	}
+	await paymentRepository.insert(paymentData)
+}
+
+export async function onlinePurchase(
+	cardNumber: string,
+	cvc: string,
+	expirationDate: string,
+	cardHolderName: string,
+	businessName: string,
+	amount: number
+){
+	const data = {
+		cardNumber,
+		cvc,
+		expirationDate,
+		cardHolderName,
+		checkDate: true,
+		providedDate: true,
+		online: true,
+		purchaseAttempt: true
+	}
+	const card = await validateCardData(data)
+
+	const business = await validateBusinessAndPurchase(businessName, amount, card)
 
 	const paymentData: paymentRepository.PaymentInsertData = {
 		cardId: card.id,

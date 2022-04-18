@@ -32,7 +32,7 @@ export async function createCard(type: cardRepository.TransactionTypes, cpf: str
 			else joinedName += separatedName[i][0].toUpperCase() + ' '
 		}
 	}
-	joinedName = joinedName.slice(-1)
+	joinedName = joinedName.slice(0, -1)
 
 	const date = dayjs().add(5, 'y').format('MM/YY')
 

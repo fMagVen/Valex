@@ -6,3 +6,9 @@ export async function makePurchase(req: Request, res: Response){
 	await paymentService.makePurchase(cardNumber, password, businessName, amount)
 	res.sendStatus(200)
 }
+
+export async function onlinePurchase(req: Request, res: Response){
+	const {cardNumber, cvc, expirationDate, cardHolderName, businessName, amount} = req.body
+	await paymentService.onlinePurchase(cardNumber, cvc, expirationDate, cardHolderName, businessName, amount)
+	res.sendStatus(200)
+}
