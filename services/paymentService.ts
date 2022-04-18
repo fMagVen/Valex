@@ -1,7 +1,7 @@
 import * as cardRepository from "../repositories/cardRepository.js"
 import * as businessRepository from "../repositories/businessRepository.js"
 import * as paymentRepository from "../repositories/paymentRepository.js"
-import { getTransactionsById } from "../helpers/transactionsHelper.js"
+import getTransactionsById from "../helpers/transactionsHelper.js"
 import bcrypt from "bcrypt"
 
 export async function makePurchase(

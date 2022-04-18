@@ -24,3 +24,9 @@ export async function rechargeCard(req: Request, res: Response){
 	await cardsService.rechargeCard(type, cpf, amount)
 	res.sendStatus(200)
 }
+
+export async function blockCard(req: Request, res: Response){
+	const {cardNumber, cvc, password} = req.body
+	await cardsService.blockCard(cardNumber, cvc, password)
+	res.sendStatus(200)
+}

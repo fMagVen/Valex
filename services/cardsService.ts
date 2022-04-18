@@ -1,7 +1,8 @@
 import * as cardRepository from "../repositories/cardRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
 import * as rechargeRepository from "../repositories/rechargeRepository.js";
-import { getTransactionsById } from "../helpers/transactionsHelper.js";
+import getTransactionsById from "../helpers/transactionsHelper.js";
+import validateCardData from "../helpers/cardValidationHelper.js"
 import { faker } from "@faker-js/faker"
 import dayjs from "dayjs"
 import bcrypt from "bcrypt"
@@ -31,7 +32,7 @@ export async function createCard(type: cardRepository.TransactionTypes, cpf: str
 			else joinedName += separatedName[i][0].toUpperCase() + ' '
 		}
 	}
-	joinedName.slice(-1)
+	joinedName = joinedName.slice(-1)
 
 	const date = dayjs().add(5, 'y').format('MM/YY')
 
@@ -57,23 +58,27 @@ export async function createCard(type: cardRepository.TransactionTypes, cpf: str
 	return {...finalCardData, securityCode: cvc}
 }
 
-export async function activateCard(number: string, cvc: string, newPassword: string){
+export async function activateCard(cardNumber: string, cvc: string, newPassword: string){
 
-	const card = await cardRepository.findByNumber(number)
-	if(!card) throw {type: 404, message: 'mispelled card number or non existant card'}
-	if(card.expirationDate < Date.now()) throw {type: 401, message: 'card already expired'}
-	if(card.password) throw {type: 400, message: 'card already activated'}
-	if(!bcrypt.compareSync(cvc, card.securityCode)) throw {type: 401, message: 'wrong cvc number'}
+	const data = {
+		cardNumber,
+		cvc,
+		activate: true,
+		checkDate: true
+	}
+	const card = await validateCardData(data)
 
 	const cryptoPassword = bcrypt.hashSync(newPassword, 3)
-	const updatedCardData: cardRepository.CardUpdateData = {password: cryptoPassword}
+	const updatedCardData: cardRepository.CardUpdateData = {password: cryptoPassword, isBlocked: false}
 	await cardRepository.update(card.id, updatedCardData)
 }
 
 export async function verifyCardTransactions(cardNumber: string, cvc: string){
-	const card = await cardRepository.findByNumber(cardNumber)
-	if(!card) throw {type: 404, message: 'mispelled card number or non existant card'}
-	if(!bcrypt.compareSync(cvc, card.securityCode)) throw {type: 401, message: 'wrong cvc number'}
+	const data = {
+		cardNumber,
+		cvc
+	}
+	const card = await validateCardData(data)
 
 	const transactions = await getTransactionsById(card.id)
 	return transactions
@@ -88,4 +93,19 @@ export async function rechargeCard(type: cardRepository.TransactionTypes, cpf: s
 		amount
 	}
 	await rechargeRepository.insert(insertData)
+}
+
+export async function blockCard(cardNumber: string, cvc: string, password: string){
+	const data = {
+		cardNumber,
+		cvc,
+		password,
+		checkDate: true,
+		checkBlock: true
+	}
+	const card = await validateCardData(data)
+	const update: cardRepository.CardUpdateData = {
+		isBlocked: true
+	}
+	await cardRepository.update(card.id, update)
 }

@@ -1,7 +1,7 @@
 import * as paymentRepository from "../repositories/paymentRepository.js";
 import * as rechargeRepository from "../repositories/rechargeRepository.js";
 
-export async function getTransactionsById(id: number){
+export default async function getTransactionsById(id: number){
 	const payments = await paymentRepository.findByCardId(id)
 	const recharges = await rechargeRepository.findByCardId(id)
 	let balance = 0

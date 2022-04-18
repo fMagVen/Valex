@@ -29,3 +29,9 @@ export const rechargeCardSchema = Joi.object({
 	cpf: Joi.string().min(11).max(11).required(),
 	amount: Joi.number().min(1).required()
 })
+
+export const blockCardSchema = Joi.object({
+	cardNumber: Joi.string().pattern(/^[0-9]{1,}$/).required(),
+	cvc: Joi.string().pattern(/^[0-9]{3}$/).required(),
+	password: Joi.string().pattern(/^[0-9]{4}$/).required()
+})
