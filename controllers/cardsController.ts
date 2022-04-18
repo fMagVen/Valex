@@ -15,7 +15,7 @@ export async function activateCard(req: Request, res: Response){
 
 export async function verifyCardTransactions(req: Request, res: Response){
 	const {cardNumber, cvc} = req.body
-	const transactions = cardsService.verifyCardTransactions(cardNumber, cvc)
+	const transactions = await cardsService.verifyCardTransactions(cardNumber, cvc)
 	res.status(200).send(transactions)
 }
 
