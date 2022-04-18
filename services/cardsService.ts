@@ -91,3 +91,13 @@ export async function verifyCardTransactions(cardNumber: string, cvc: string){
 	}
 	return transactions
 }
+
+export async function rechargeCard(type: cardRepository.TransactionTypes, cpf: string, amount: number){
+	const card = await cardRepository.findByTypeAndEmployeeCpf(type, cpf)
+	if(!card) throw {type: 404, message: 'card with given number and employee cpf not found'}
+	const insertData = {
+		cardId: card.id,
+		amount
+	}
+	await rechargeRepository.insert(insertData)
+}

@@ -18,3 +18,9 @@ export async function verifyCardTransactions(req: Request, res: Response){
 	const transactions = cardsService.verifyCardTransactions(cardNumber, cvc)
 	res.status(200).send(transactions)
 }
+
+export async function rechargeCard(req: Request, res: Response){
+	const {type, cpf, amount} = req.body
+	await cardsService.rechargeCard(type, cpf, amount)
+	res.sendStatus(200)
+}

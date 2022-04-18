@@ -23,3 +23,9 @@ export const activateCardSchema = Joi.object({
 	cvc: Joi.string().pattern(/^[0-9]{3}$/).required(),
 	newPassword: Joi.string().pattern(/^[0-9]{4}$/).required()
 })
+
+export const rechargeCardSchema = Joi.object({
+	type: Joi.any().valid(...cardTypes).required(),
+	cpf: Joi.string().min(11).max(11).required(),
+	amount: Joi.number().min(1).required()
+})
