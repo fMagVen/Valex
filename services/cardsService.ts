@@ -17,10 +17,12 @@ export async function createCard(type: cardRepository.TransactionTypes, cpf: str
 	const existingCardType = await cardRepository.findByTypeAndEmployeeCpf(type, cpf)
 	if(existingCardType) throw { type: 409, message: 'employee already has a card of that type' }
 
-	let cardNumber = faker.datatype.bigInt().toString()
+	let cardNumber = faker.finance.creditCardNumber('mastercard')
+	let arrCardNumber = cardNumber.split('-')
+	cardNumber = arrCardNumber.join('')
 	let existingCardNumber = await cardRepository.findByNumber(cardNumber)
 	while(existingCardNumber){
-		cardNumber = faker.datatype.bigInt().toString()
+		cardNumber = faker.finance.creditCardNumber('mastercard')
 		existingCardNumber = await cardRepository.findByNumber(cardNumber)
 	}
 
