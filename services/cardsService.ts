@@ -101,11 +101,19 @@ export async function blockCard(cardNumber: string, cvc: string, password: strin
 		cvc,
 		password,
 		checkDate: true,
-		checkBlock: true
 	}
 	const card = await validateCardData(data)
-	const update: cardRepository.CardUpdateData = {
-		isBlocked: true
+	let update: cardRepository.CardUpdateData
+	if(card.isBlocked){
+		update = {
+			isBlocked: false
+		}
+	}
+	else{
+		update = {
+			isBlocked: true
+		}
 	}
 	await cardRepository.update(card.id, update)
+	return update
 }

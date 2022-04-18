@@ -8,6 +8,5 @@ export default async function validateCardData(cardData){
 	if(cardData.activate && card.password) throw {type: 400, message: 'card already activated'}
 	if(cardData.password && !bcrypt.compareSync(cardData.password, card.password)) throw {type: 401, message: 'wrong password'}
 	if(cardData.checkDate && card.date < Date.now()) throw {type: 400, message: 'card already expired'}
-	if(cardData.checkBlock && card.isBlocked) throw {type: 400, message: 'card already blocked'}
 	return card
 }
