@@ -72,3 +72,119 @@ Add new card to employee. Send header 'x-api-key' with value of the desined API 
 }
 
 Employees can only have one card of each type. A successful request will create and return the created card data. It is important to store the information safely, as some sensitive data will be stored encrypted and will not be possible to be retrieved later, in case of loss the lost card will have to be deleted and a new card created.
+
+#### ```POST /cards/activate```
+
+Activate a card. Card must already be created by the company.
+
+{
+
+	cardNumber: card number, as a string, returned upon card creation
+	cvc: 3 digit numerical security code, as a string, also returned upon card creation
+	newPassword: 4 digit numerical string
+
+}
+
+#### ```POST /cards/transactions```
+
+Get all transactions of a card. Send request with:
+
+{
+
+	cardNumber: same as above
+	cvc: same as above
+
+}
+
+The returned JSON will be:
+
+{
+
+	balance: total card balance,
+	transactions: array of objects containing all payments, keys are:
+		id: transaction id
+		cardId: card id
+		businessId: id of business balance was spent
+		businessName: name of business
+		timestamp: date in format DD/MM/YYYY
+		amount: amount spent
+	recharges: array of objects containing all recharges the card received, keys are:
+		id: recharge id
+		cardId: same as above
+		timestamp: same as above
+		amount: amount deposited as credit in card
+
+}
+
+#### ```POST /cards/recharge```
+
+This endpoint allows the company the employee works in to recharge their card, send the API header with:
+
+{
+
+	type: type of card,
+	cpf: cpf of employee,
+	amount: amount to be deposited
+
+}
+
+#### ```POST /cards/block```
+
+Blocks and unblocks a card. Send request with:
+
+{
+
+	cardNumber,
+	cvc,
+	password: 4 digit string set upon card activation
+
+}
+
+The API will reply with a JSON informing the state of the block situation of the card as:
+
+{
+
+	isBlocked: boolean
+
+}
+
+#### ```POST /buy```
+
+Make a purchase from a business. Send a request with the following:
+
+{
+
+	cardNumber,
+	password,
+	businessName,
+	amount: amount to be spent
+
+}
+
+The purchase can only be completed if the card has enough balance
+
+#### ```POST /online```
+
+Same idea, to buy something, but now online. Request:
+
+{
+
+	cardNumber,
+	cvc,
+	expirationDate: expiration date of card
+	businessName,
+	amount
+
+}
+
+All data must match. Purchase only to be completed if card has enough balance.
+
+
+### :man_technologist: Author
+<p>Made with care by</p>
+
+<a href="https://github.com/fMagVen"><img  style="border-radius: 50%;"  src="https://avatars.githubusercontent.com/u/78576546?v=4"  width="100px;"  alt="Felipe Ventura"/></a>
+
+[![Gmail Badge](https://img.shields.io/badge/-fmagven93@gmail.com-c14438?style=flat&logo=Gmail&logoColor=white&link=mailto:fmagven93@gmail.com)](mailto:fmagven93@gmail.com)
+
+[![Linkedin Badge](https://img.shields.io/badge/-Felipe-Ventura?style=flat&logo=Linkedin&logoColor=white&color=blue&link=https://www.linkedin.com/in/fmagven/)](https://www.linkedin.com/in/fmagven/)
